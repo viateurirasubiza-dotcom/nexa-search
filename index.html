@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXA Search — Search Beyond Limits</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom Design Tokens & Variables */
+        :root {
+            --bg-dark: #070B14;
+            --surface-1: #0D1527;
+            --surface-2: #142038;
+            --neon-cyan: #00E5FF;
+            --neon-blue: #3B82F6;
+            --neon-purple: #A855F7;
+            --success-green: #10B981;
+            --glass-bg: rgba(13, 21, 39, 0.7);
+            --glass-border: rgba(0, 229, 255, 0.15);
+        }
+
+        .theme-cyberpunk {
+            --bg-dark: #03060C;
+            --surface-1: #0A0F1D;
+            --surface-2: #121B30;
+            --neon-cyan: #00FFFF;
+            --neon-blue: #0088FF;
+            --neon-purple: #D946EF;
+            --glass-bg: rgba(10, 15, 29, 0.85);
+            --glass-border: rgba(0, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #F3F4F6;
+            overflow-x: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Glassmorphism Styling */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-input {
+            background: rgba(20, 32, 56, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #FFFFFF;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+            outline: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(7, 11, 20, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 229, 255, 0.2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 229, 255, 0.5);
+        }
+
+        /* Ambient Canvas & Rwanda Accent Visual */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .rwanda-accent {
+            position: fixed;
+            bottom: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, rgba(246, 209, 21, 0.02) 40%, rgba(32, 96, 61, 0.02) 70%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(40px);
+        }
+
+        /* Pulse Animations */
+        @keyframes pulse-cyan {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(0, 229, 255, 0.6); }
+        }
+
+        .pulse-glow {
+            animation: pulse-cyan 3s infinite;
+        }
+
+        @keyframes mic-recording {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; color: #EF4444; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .recording-active {
+            animation: mic-recording 1.2s infinite ease-in-out;
+            color: #EF4444 !important;
+        }
+
+        /* Modal Transitions */
+        .modal-overlay {
+            transition: opacity 0.25s ease-in-out, visibility 0.25s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+            transform: scale(0.95) translateY(10px);
+            opacity: 0;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Electron Window Drag Utility */
+        .titlebar-drag {
+            -webkit-app-region: drag;
+        }
+        .titlebar-no-drag {
+            -webkit-app-region: no-drag;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col h-screen overflow-hidden text-gray-100">
+
+    <!-- Dynamic Ambient Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Rwanda Hill Pattern Graphic Overlay Accent (Subtle Cultural Visual Touch) -->
+    <div class="rwanda-accent" aria-hidden="true"></div>
+    <svg class="fixed top-0 right-0 opacity-5 pointer-events-none z-0 w-96 h-96 text-cyan-400" viewBox="0 0 100 100" fill="none">
+        <!-- Sun Rays and Golden Hill Wave Accent -->
+        <circle cx="85" cy="15" r="8" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1 1"/>
+        <path d="M 50,100 Q 65,70 80,100 T 110,100" stroke="currentColor" stroke-width="0.5" fill="none"/>
+        <path d="M 20,100 Q 50,60 80,100" stroke="currentColor" stroke-width="0.5" fill="none"/>
+    </svg>
+
+    <!-- Application Header -->
+    <header class="titlebar-drag relative z-10 flex items-center justify-between px-4 py-2.5 border-b border-cyan-500/10 glass-panel">
+        <!-- Logo & Branding -->
+        <div class="flex items-center space-x-3 titlebar-no-drag">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center p-0.5 shadow-lg shadow-cyan-500/20">
+                <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid font-bold text-cyan-400 text-lg fa-compass"></i>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-heading font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">NEXA SEARCH</span>
+                    <span class="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-500/30">v1.0</span>
+                </div>
+                <p class="text-[10px] text-gray-400 -mt-1 tracking-tight">Search Beyond Limits • <span class="text-gray-500">By IRASUBIZA Viateur</span></p>
+            </div>
+        </div>
+
+        <!-- Quick Engine Selector in Header -->
+        <div class="hidden md:flex items-center space-x-1 bg-slate-900/80 p-1 rounded-xl border border-cyan-500/15 titlebar-no-drag" id="header-engine-selector">
+            <button data-provider="google" class="engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-cyan-400 bg-cyan-950/50 border border-cyan-500/30">
+                <i class="fa-brands fa-google text-xs"></i>
+                <span>Google</span>
+            </button>
+            <button data-provider="bing" class="engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-gray-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-brands fa-microsoft text-xs"></i>
+                <span>Bing</span>
+            </button>
+            <button data-provider="duckduckgo" class="engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-gray-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-shield-halved text-xs"></i>
+                <span>DuckDuckGo</span>
+            </button>
+            <button data-provider="youtube" class="engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-gray-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-brands fa-youtube text-xs"></i>
+                <span>YouTube</span>
+            </button>
+            <button data-provider="wikipedia" class="engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-gray-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-book-bookmark text-xs"></i>
+                <span>Wikipedia</span>
+            </button>
+        </div>
+
+        <!-- Header Actions & Controls -->
+        <div class="flex items-center space-x-2 titlebar-no-drag">
+            <!-- Theme Toggle -->
+            <button id="btn-theme-toggle" class="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-slate-800/60 transition-all border border-transparent hover:border-cyan-500/20" title="Toggle Visual Style">
+                <i class="fa-solid fa-palette text-sm"></i>
+            </button>
+
+            <!-- Settings Trigger -->
+            <button id="btn-open-settings" class="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-slate-800/60 transition-all border border-transparent hover:border-cyan-500/20" title="Settings">
+                <i class="fa-solid fa-sliders text-sm"></i>
+            </button>
+
+            <!-- Profile Menu Button & Dropdown Container -->
+            <div class="relative">
+                <button id="btn-profile-dropdown" class="flex items-center space-x-2 pl-2 pr-2.5 py-1 rounded-xl bg-slate-900/80 border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
+                    <div id="user-avatar-container" class="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white overflow-hidden">
+                        <i class="fa-solid fa-user text-[10px]"></i>
+                    </div>
+                    <span id="user-name-display" class="text-xs font-medium max-w-[90px] truncate text-gray-300">Guest</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                </button>
+
+                <!-- User Dropdown Menu -->
+                <div id="profile-menu" class="hidden absolute right-0 mt-2 w-56 glass-panel rounded-xl shadow-2xl py-2 z-50 border border-cyan-500/20">
+                    <div class="px-4 py-2 border-b border-gray-800">
+                        <p id="menu-user-name" class="text-xs font-semibold text-white truncate">Guest User</p>
+                        <p id="menu-user-email" class="text-[10px] text-gray-400 truncate">Not signed in</p>
+                    </div>
+                    <a id="btn-menu-signin" href="#" class="flex items-center space-x-2 px-4 py-2 text-xs text-cyan-400 hover:bg-cyan-950/40 transition-all">
+                        <i class="fa-brands fa-google"></i>
+                        <span>Sign In with Google</span>
+                    </a>
+                    <a id="btn-menu-signout" href="#" class="hidden flex items-center space-x-2 px-4 py-2 text-xs text-red-400 hover:bg-red-950/30 transition-all">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Sign Out</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Electron Window Control Buttons -->
+            <div class="flex items-center space-x-1 pl-2 border-l border-slate-800" id="window-controls">
+                <button id="win-min-btn" class="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-slate-800 hover:text-white transition-all" title="Minimize">
+                    <i class="fa-solid fa-minus text-[10px]"></i>
+                </button>
+                <button id="win-max-btn" class="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-slate-800 hover:text-white transition-all" title="Maximize">
+                    <i class="fa-regular fa-square text-[10px]"></i>
+                </button>
+                <button id="win-close-btn" class="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-red-600 hover:text-white transition-all" title="Close">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Search Command Center Section -->
+    <main class="relative z-10 flex-1 flex flex-col p-4 md:p-6 overflow-hidden">
+        <div class="max-w-4xl w-full mx-auto flex flex-col space-y-4">
+            
+            <!-- Main Search Input Card -->
+            <div class="relative glass-panel rounded-2xl p-2 shadow-2xl transition-all border border-cyan-500/20 hover:border-cyan-500/40 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/20">
+                <form id="search-form" class="flex items-center w-full">
+                    
+                    <!-- Search Engine Active Indicator/Dropdown -->
+                    <div class="relative pl-3 pr-2 py-2 flex items-center border-r border-slate-700/60">
+                        <span id="active-engine-icon" class="text-cyan-400 text-lg mr-2">
+                            <i class="fa-brands fa-google"></i>
+                        </span>
+                        <span id="active-engine-label" class="text-xs font-semibold text-gray-300 hidden sm:inline mr-2">Google</span>
+                    </div>
+
+                    <!-- Input Field -->
+                    <div class="relative flex-1 flex items-center">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="w-full bg-transparent px-4 py-2.5 text-base md:text-lg text-white placeholder-gray-500 focus:outline-none"
+                            placeholder="Search the web, ask a query, or enter URL..."
+                            autocomplete="off"
+                            aria-label="Search Query"
+                        />
+                        
+                        <!-- Input Clearing Button -->
+                        <button type="button" id="btn-clear-input" class="hidden text-gray-500 hover:text-gray-300 px-2 transition-all" title="Clear text">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Voice Search Button -->
+                    <button type="button" id="btn-voice-search" class="p-3 text-gray-400 hover:text-cyan-400 rounded-xl transition-all hover:bg-cyan-950/30 mr-1" title="Voice Search">
+                        <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
+                    </button>
+
+                    <!-- Search Submit Button -->
+                    <button type="submit" id="btn-search-submit" class="px-5 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold rounded-xl transition-all flex items-center space-x-2 shadow-lg shadow-cyan-500/20 active:scale-95">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                        <span class="hidden sm:inline text-xs uppercase tracking-wider font-extrabold">Search</span>
+                    </button>
+                </form>
+
+                <!-- Search Suggestions Autocomplete Dropdown Panel -->
+                <div id="suggestions-panel" class="hidden absolute left-0 right-0 top-full mt-2 glass-panel rounded-xl shadow-2xl overflow-hidden z-50 border border-cyan-500/20 max-h-60 overflow-y-auto">
+                    <!-- Suggestions rendered dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Voice Search Active Status Indicator -->
+            <div id="voice-status-banner" class="hidden flex items-center justify-between px-4 py-2 bg-cyan-950/80 border border-cyan-500/40 rounded-xl text-xs text-cyan-300">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    <span id="voice-status-text">Listening... Speak now.</span>
+                </div>
+                <button id="btn-cancel-voice" class="text-xs text-gray-400 hover:text-white underline">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Content Display Area / Web Container (#web-content) -->
+        <div id="web-content" class="relative flex-1 mt-4 rounded-2xl overflow-hidden glass-panel border border-cyan-500/15 flex flex-col">
+            
+            <!-- Embedded Browser Toolbar (Active when frame loaded) -->
+            <div id="frame-toolbar" class="hidden flex items-center justify-between px-4 py-2 bg-slate-950/90 border-b border-cyan-500/20 text-xs">
+                <div class="flex items-center space-x-2 flex-1 mr-4 overflow-hidden">
+                    <button id="frame-back" class="p-1.5 text-gray-400 hover:text-white rounded transition-all" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button id="frame-reload" class="p-1.5 text-gray-400 hover:text-white rounded transition-all" title="Reload"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div class="flex-1 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 text-gray-300 truncate font-mono text-[11px]" id="frame-url-display">
+                        https://www.google.com
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="frame-open-external" class="px-3 py-1 bg-cyan-950 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-900/50 rounded-lg transition-all flex items-center space-x-1">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        <span>Open in System Browser</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Welcome Screen (Default State) -->
+            <div id="welcome-view" class="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 p-1 mb-4 shadow-2xl shadow-cyan-500/30 pulse-glow">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <i class="fa-solid fa-compass text-4xl text-cyan-400"></i>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl font-bold tracking-tight text-white mb-2">Search Beyond Limits</h1>
+                <p class="text-sm text-gray-400 max-w-md mb-8">
+                    Experience ultra-fast multi-engine web search with strict local privacy, integrated voice query, and smart local indexing.
+                </p>
+
+                <!-- Feature Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl w-full mb-8">
+                    <div class="glass-panel p-4 rounded-xl border border-cyan-500/10 text-left hover:border-cyan-500/30 transition-all">
+                        <i class="fa-solid fa-bolt text-cyan-400 text-xl mb-2"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Multi-Engine</h3>
+                        <p class="text-[11px] text-gray-400">Switch instantly between Google, Bing, DuckDuckGo, YouTube & Wikipedia.</p>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-cyan-500/10 text-left hover:border-cyan-500/30 transition-all">
+                        <i class="fa-solid fa-user-shield text-purple-400 text-xl mb-2"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Privacy First</h3>
+                        <p class="text-[11px] text-gray-400">Your search queries and local history never leave your device.</p>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-cyan-500/10 text-left hover:border-cyan-500/30 transition-all">
+                        <i class="fa-solid fa-microphone-lines text-blue-400 text-xl mb-2"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Voice Query</h3>
+                        <p class="text-[11px] text-gray-400">Hands-free searching using Web Speech voice recognition.</p>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-cyan-500/10 text-left hover:border-cyan-500/30 transition-all">
+                        <i class="fa-solid fa-desktop text-emerald-400 text-xl mb-2"></i>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-1">Desktop Native</h3>
+                        <p class="text-[11px] text-gray-400">Optimized for Electron desktop performance with native shell hooks.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Search Quick Tags Container -->
+                <div id="recent-tags-container" class="w-full max-w-2xl text-left">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent Searches</span>
+                        <button id="btn-clear-history-quick" class="text-[11px] text-cyan-400 hover:underline">Clear History</button>
+                    </div>
+                    <div id="recent-tags-list" class="flex flex-wrap gap-2">
+                        <span class="text-xs text-gray-500 italic">No search history yet. Try searching for something above!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Iframe Container -->
+            <div id="iframe-container" class="hidden flex-1 relative w-full h-full bg-slate-950">
+                <iframe id="content-frame" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+                
+                <!-- X-Frame-Options Fallback Message Overlay -->
+                <div id="frame-fallback-overlay" class="hidden absolute inset-0 glass-panel flex flex-col items-center justify-center p-6 text-center z-20">
+                    <i class="fa-solid fa-shield-cat text-4xl text-amber-400 mb-3"></i>
+                    <h3 class="text-lg font-bold text-white mb-1">External Frame Protection Detected</h3>
+                    <p class="text-xs text-gray-300 max-w-md mb-4">
+                        This search provider restricts embedding inside an HTML frame via <code class="text-cyan-300">X-Frame-Options</code> or Content Security Policy.
+                    </p>
+                    <button id="btn-fallback-launch" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                        Open Search Results in Browser
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sign-In Modal (Firebase Google Auth) -->
+    <div id="modal-auth" class="modal-overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div class="modal-container glass-panel max-w-md w-full rounded-2xl p-6 border border-cyan-500/30 relative">
+            <button class="modal-close absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-user-lock text-xl text-slate-950"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">NEXA Account Sign In</h2>
+                <p class="text-xs text-gray-400 mt-1">Connect your Google account to sync preferences safely.</p>
+            </div>
+
+            <!-- Auth Status Notification Banner -->
+            <div id="auth-status-message" class="hidden mb-4 p-3 rounded-xl text-xs border"></div>
+
+            <div class="space-y-3">
+                <button id="btn-google-signin" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/40 rounded-xl font-medium text-xs text-white flex items-center justify-center space-x-3 transition-all">
+                    <i class="fa-brands fa-google text-red-400 text-base"></i>
+                    <span>Continue with Google</span>
+                </button>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-gray-500 text-center">
+                <p>Firebase Authentication runs in client mode. Electron Google OAuth requires explicit deep-link handling configured in <code class="text-cyan-400">main.js</code>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="modal-overlay fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div class="modal-container glass-panel max-w-lg w-full rounded-2xl p-6 border border-cyan-500/30 relative">
+            <button class="modal-close absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-6">
+                <i class="fa-solid fa-sliders text-cyan-400 text-xl"></i>
+                <div>
+                    <h2 class="text-lg font-bold text-white">Application Settings</h2>
+                    <p class="text-xs text-gray-400">Customize your search environment</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <!-- Default Provider Preference -->
+                <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                    <div>
+                        <p class="font-semibold text-gray-200">Default Search Provider</p>
+                        <p class="text-[11px] text-gray-400">Primary search engine on launch</p>
+                    </div>
+                    <select id="setting-default-engine" class="bg-slate-900 border border-slate-700 text-cyan-400 rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500">
+                        <option value="google">Google</option>
+                        <option value="bing">Bing</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="wikipedia">Wikipedia</option>
+                    </select>
+                </div>
+
+                <!-- Theme Selection -->
+                <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                    <div>
+                        <p class="font-semibold text-gray-200">Visual Theme</p>
+                        <p class="text-[11px] text-gray-400">Adjust aesthetic surface contrast</p>
+                    </div>
+                    <select id="setting-theme" class="bg-slate-900 border border-slate-700 text-cyan-400 rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500">
+                        <option value="default">Default Dark Navy</option>
+                        <option value="cyberpunk">Cyberpunk High Contrast</option>
+                    </select>
+                </div>
+
+                <!-- Search Suggestions Toggle -->
+                <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                    <div>
+                        <p class="font-semibold text-gray-200">Enable Search Autocomplete</p>
+                        <p class="text-[11px] text-gray-400">Show suggestions from previous local queries</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="setting-suggestions" class="sr-only peer" checked>
+                        <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                    </label>
+                </div>
+
+                <!-- Clear History Action -->
+                <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                    <div>
+                        <p class="font-semibold text-gray-200">Clear Search History</p>
+                        <p class="text-[11px] text-gray-400">Permanently erase local stored searches</p>
+                    </div>
+                    <button id="btn-setting-clear-history" class="px-3 py-1.5 bg-red-950/60 border border-red-500/40 text-red-400 hover:bg-red-900/60 rounded-lg transition-all">
+                        Clear All Data
+                    </button>
+                </div>
+
+                <!-- About Section -->
+                <div class="pt-2">
+                    <p class="font-semibold text-gray-200 mb-1">About NEXA Search</p>
+                    <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[11px] space-y-1 text-gray-400">
+                        <p><strong class="text-gray-300">Application:</strong> NEXA Search Desktop</p>
+                        <p><strong class="text-gray-300">Developer:</strong> IRASUBIZA Viateur</p>
+                        <p><strong class="text-gray-300">Runtime Context:</strong> <span id="platform-context-display" class="text-cyan-400">Detecting...</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        (function () {
+            'use strict';
+
+            /* Application State Engine */
+            const STATE = {
+                currentProvider: 'google',
+                searchHistory: [],
+                user: null,
+                settings: {
+                    defaultEngine: 'google',
+                    theme: 'default',
+                    enableSuggestions: true
+                },
+                isVoiceActive: false,
+                recognition: null,
+                activeQueryUrl: ''
+            };
+
+            /* Engine URL Configuration Registry */
+            const PROVIDERS = {
+                google: {
+                    name: 'Google',
+                    url: 'https://www.google.com/search?q=',
+                    icon: 'fa-brands fa-google',
+                    color: 'text-cyan-400'
+                },
+                bing: {
+                    name: 'Bing',
+                    url: 'https://www.bing.com/search?q=',
+                    icon: 'fa-brands fa-microsoft',
+                    color: 'text-blue-400'
+                },
+                duckduckgo: {
+                    name: 'DuckDuckGo',
+                    url: 'https://duckduckgo.com/?q=',
+                    icon: 'fa-solid fa-shield-halved',
+                    color: 'text-amber-400'
+                },
+                youtube: {
+                    name: 'YouTube',
+                    url: 'https://www.youtube.com/results?search_query=',
+                    icon: 'fa-brands fa-youtube',
+                    color: 'text-red-400'
+                },
+                wikipedia: {
+                    name: 'Wikipedia',
+                    url: 'https://en.wikipedia.org/wiki/Special:Search?search=',
+                    icon: 'fa-solid fa-book-bookmark',
+                    color: 'text-emerald-400'
+                }
+            };
+
+            /* DOM Element Cache */
+            const DOM = {};
+
+            /* Initialization Entry Point */
+            window.addEventListener('DOMContentLoaded', () => {
+                cacheDOMElements();
+                initBackgroundCanvas();
+                loadStorageData();
+                applyTheme(STATE.settings.theme);
+                initVoiceRecognition();
+                detectRuntimeEnvironment();
+                bindEventListeners();
+                updateEngineUI(STATE.currentProvider);
+                renderRecentHistory();
+                initFirebaseFallback();
+            });
+
+            function cacheDOMElements() {
+                DOM.searchInput = document.getElementById('search-input');
+                DOM.searchForm = document.getElementById('search-form');
+                DOM.btnClearInput = document.getElementById('btn-clear-input');
+                DOM.btnVoiceSearch = document.getElementById('btn-voice-search');
+                DOM.micIcon = document.getElementById('mic-icon');
+                DOM.voiceStatusBanner = document.getElementById('voice-status-banner');
+                DOM.voiceStatusText = document.getElementById('voice-status-text');
+                DOM.btnCancelVoice = document.getElementById('btn-cancel-voice');
+                DOM.suggestionsPanel = document.getElementById('suggestions-panel');
+                
+                DOM.activeEngineIcon = document.getElementById('active-engine-icon');
+                DOM.activeEngineLabel = document.getElementById('active-engine-label');
+                DOM.headerEngineSelector = document.getElementById('header-engine-selector');
+                
+                DOM.webContent = document.getElementById('web-content');
+                DOM.welcomeView = document.getElementById('welcome-view');
+                DOM.iframeContainer = document.getElementById('iframe-container');
+                DOM.contentFrame = document.getElementById('content-frame');
+                DOM.frameToolbar = document.getElementById('frame-toolbar');
+                DOM.frameUrlDisplay = document.getElementById('frame-url-display');
+                DOM.frameFallbackOverlay = document.getElementById('frame-fallback-overlay');
+                DOM.btnFallbackLaunch = document.getElementById('btn-fallback-launch');
+                
+                DOM.recentTagsList = document.getElementById('recent-tags-list');
+                DOM.btnClearHistoryQuick = document.getElementById('btn-clear-history-quick');
+                
+                DOM.btnThemeToggle = document.getElementById('btn-theme-toggle');
+                DOM.btnOpenSettings = document.getElementById('btn-open-settings');
+                DOM.btnProfileDropdown = document.getElementById('btn-profile-dropdown');
+                DOM.profileMenu = document.getElementById('profile-menu');
+                DOM.userNameDisplay = document.getElementById('user-name-display');
+                DOM.userAvatarContainer = document.getElementById('user-avatar-container');
+                DOM.menuUserName = document.getElementById('menu-user-name');
+                DOM.menuUserEmail = document.getElementById('menu-user-email');
+                DOM.btnMenuSignin = document.getElementById('btn-menu-signin');
+                DOM.btnMenuSignout = document.getElementById('btn-menu-signout');
+                
+                DOM.modalAuth = document.getElementById('modal-auth');
+                DOM.modalSettings = document.getElementById('modal-settings');
+                DOM.btnGoogleSignin = document.getElementById('btn-google-signin');
+                DOM.authStatusMessage = document.getElementById('auth-status-message');
+                
+                DOM.settingDefaultEngine = document.getElementById('setting-default-engine');
+                DOM.settingTheme = document.getElementById('setting-theme');
+                DOM.settingSuggestions = document.getElementById('setting-suggestions');
+                DOM.btnSettingClearHistory = document.getElementById('btn-setting-clear-history');
+                DOM.platformContextDisplay = document.getElementById('platform-context-display');
+                
+                DOM.winMinBtn = document.getElementById('win-min-btn');
+                DOM.winMaxBtn = document.getElementById('win-max-btn');
+                DOM.winCloseBtn = document.getElementById('win-close-btn');
+            }
+
+            function initBackgroundCanvas() {
+                const canvas = document.getElementById('bg-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+
+                const particles = Array.from({ length: 35 }, () => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    alpha: Math.random() * 0.5 + 0.2
+                }));
+
+                function render() {
+                    ctx.clearRect(0, 0, width, height);
+                    particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < 0) p.x = width;
+                        if (p.x > width) p.x = 0;
+                        if (p.y < 0) p.y = height;
+                        if (p.y > height) p.y = 0;
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(0, 229, 255, ${p.alpha})`;
+                        ctx.fill();
+                    });
+                    requestAnimationFrame(render);
+                }
+
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                });
+
+                render();
+            }
+
+            function loadStorageData() {
+                try {
+                    const savedHistory = localStorage.getItem('nexa_search_history');
+                    if (savedHistory) STATE.searchHistory = JSON.parse(savedHistory);
+
+                    const savedSettings = localStorage.getItem('nexa_search_settings');
+                    if (savedSettings) {
+                        STATE.settings = { ...STATE.settings, ...JSON.parse(savedSettings) };
+                        STATE.currentProvider = STATE.settings.defaultEngine;
+                    }
+                } catch (e) {
+                    console.warn('LocalStorage access unverified or restricted:', e);
+                }
+            }
+
+            function saveStorageSettings() {
+                try {
+                    localStorage.setItem('nexa_search_settings', JSON.stringify(STATE.settings));
+                } catch (e) {
+                    console.error('Failed to save settings to localStorage:', e);
+                }
+            }
+
+            function saveSearchToHistory(query, provider) {
+                if (!query || !query.trim()) return;
+                const cleanQuery = query.trim();
+                STATE.searchHistory = STATE.searchHistory.filter(item => item.query.toLowerCase() !== cleanQuery.toLowerCase());
+                STATE.searchHistory.unshift({
+                    query: cleanQuery,
+                    provider: provider,
+                    timestamp: Date.now()
+                });
+                if (STATE.searchHistory.length > 30) STATE.searchHistory.pop();
+                
+                try {
+                    localStorage.setItem('nexa_search_history', JSON.stringify(STATE.searchHistory));
+                } catch (e) {
+                    console.error('Failed to update history in storage:', e);
+                }
+                renderRecentHistory();
+            }
+
+            function bindEventListeners() {
+                // Search Form Submission
+                DOM.searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    executeSearch(DOM.searchInput.value);
+                });
+
+                // Search Input Value Changes
+                DOM.searchInput.addEventListener('input', () => {
+                    const val = DOM.searchInput.value;
+                    if (val.length > 0) {
+                        DOM.btnClearInput.classList.remove('hidden');
+                        if (STATE.settings.enableSuggestions) renderSuggestions(val);
+                    } else {
+                        DOM.btnClearInput.classList.add('hidden');
+                        DOM.suggestionsPanel.classList.add('hidden');
+                    }
+                });
+
+                DOM.btnClearInput.addEventListener('click', () => {
+                    DOM.searchInput.value = '';
+                    DOM.btnClearInput.classList.add('hidden');
+                    DOM.suggestionsPanel.classList.add('hidden');
+                    DOM.searchInput.focus();
+                });
+
+                // Header Engine Switching Buttons
+                DOM.headerEngineSelector.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.engine-btn');
+                    if (btn && btn.dataset.provider) {
+                        switchProvider(btn.dataset.provider);
+                    }
+                });
+
+                // Voice Search Trigger
+                DOM.btnVoiceSearch.addEventListener('click', toggleVoiceSearch);
+                DOM.btnCancelVoice.addEventListener('click', stopVoiceSearch);
+
+                // External Frame Launch Fallback Button
+                DOM.btnFallbackLaunch.addEventListener('click', () => {
+                    if (STATE.activeQueryUrl) openExternalUrl(STATE.activeQueryUrl);
+                });
+
+                // Frame Toolbar Navigation Actions
+                document.getElementById('frame-back').addEventListener('click', () => {
+                    try { DOM.contentFrame.contentWindow.history.back(); } catch (e) {}
+                });
+                document.getElementById('frame-reload').addEventListener('click', () => {
+                    try { DOM.contentFrame.contentWindow.location.reload(); } catch (e) {
+                        DOM.contentFrame.src = STATE.activeQueryUrl;
+                    }
+                });
+                document.getElementById('frame-open-external').addEventListener('click', () => {
+                    if (STATE.activeQueryUrl) openExternalUrl(STATE.activeQueryUrl);
+                });
+
+                // Quick Clear History Buttons
+                DOM.btnClearHistoryQuick.addEventListener('click', clearHistory);
+                DOM.btnSettingClearHistory.addEventListener('click', clearHistory);
+
+                // Modals Open & Close
+                DOM.btnOpenSettings.addEventListener('click', () => openModal(DOM.modalSettings));
+                DOM.btnThemeToggle.addEventListener('click', toggleTheme);
+
+                DOM.btnProfileDropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    DOM.profileMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!DOM.profileMenu.contains(e.target) && !DOM.btnProfileDropdown.contains(e.target)) {
+                        DOM.profileMenu.classList.add('hidden');
+                    }
+                    if (!DOM.suggestionsPanel.contains(e.target) && e.target !== DOM.searchInput) {
+                        DOM.suggestionsPanel.classList.add('hidden');
+                    }
+                });
+
+                // Profile Menu Actions
+                DOM.btnMenuSignin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    DOM.profileMenu.classList.add('hidden');
+                    openModal(DOM.modalAuth);
+                });
+
+                DOM.btnMenuSignout.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    signOutUser();
+                });
+
+                DOM.btnGoogleSignin.addEventListener('click', handleGoogleSignIn);
+
+                // Modal Close Buttons
+                document.querySelectorAll('.modal-close').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        closeModal(e.target.closest('.modal-overlay'));
+                    });
+                });
+
+                // Keyboard Navigation Shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal(DOM.modalAuth);
+                        closeModal(DOM.modalSettings);
+                        DOM.suggestionsPanel.classList.add('hidden');
+                        DOM.profileMenu.classList.add('hidden');
+                    }
+                });
+
+                // Settings Form Changes
+                DOM.settingDefaultEngine.value = STATE.settings.defaultEngine;
+                DOM.settingDefaultEngine.addEventListener('change', (e) => {
+                    STATE.settings.defaultEngine = e.target.value;
+                    saveStorageSettings();
+                });
+
+                DOM.settingTheme.value = STATE.settings.theme;
+                DOM.settingTheme.addEventListener('change', (e) => {
+                    STATE.settings.theme = e.target.value;
+                    applyTheme(e.target.value);
+                    saveStorageSettings();
+                });
+
+                DOM.settingSuggestions.checked = STATE.settings.enableSuggestions;
+                DOM.settingSuggestions.addEventListener('change', (e) => {
+                    STATE.settings.enableSuggestions = e.target.checked;
+                    saveStorageSettings();
+                });
+
+                // Window Control Hooks (Electron IPC Safe Handlers)
+                DOM.winMinBtn.addEventListener('click', () => {
+                    if (window.electronAPI && window.electronAPI.minimize) window.electronAPI.minimize();
+                    else showNotice('Minimize requires Electron native container.');
+                });
+                DOM.winMaxBtn.addEventListener('click', () => {
+                    if (window.electronAPI && window.electronAPI.maximize) window.electronAPI.maximize();
+                    else showNotice('Maximize requires Electron native container.');
+                });
+                DOM.winCloseBtn.addEventListener('click', () => {
+                    if (window.electronAPI && window.electronAPI.close) window.electronAPI.close();
+                    else showNotice('Close window requires Electron native container.');
+                });
+            }
+
+            function switchProvider(providerKey) {
+                if (!PROVIDERS[providerKey]) return;
+                STATE.currentProvider = providerKey;
+                updateEngineUI(providerKey);
+            }
+
+            function updateEngineUI(providerKey) {
+                const p = PROVIDERS[providerKey];
+                DOM.activeEngineIcon.className = `${p.color} text-lg mr-2`;
+                DOM.activeEngineIcon.innerHTML = `<i class="${p.icon}"></i>`;
+                DOM.activeEngineLabel.textContent = p.name;
+
+                // Update Header Buttons active states
+                const btns = DOM.headerEngineSelector.querySelectorAll('.engine-btn');
+                btns.forEach(btn => {
+                    if (btn.dataset.provider === providerKey) {
+                        btn.className = 'engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-cyan-400 bg-cyan-950/50 border border-cyan-500/30';
+                    } else {
+                        btn.className = 'engine-btn px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all text-gray-400 hover:text-white hover:bg-slate-800/60';
+                    }
+                });
+            }
+
+            function executeSearch(query) {
+                if (!query || !query.trim()) return;
+                const cleanQuery = query.trim();
+                const provider = PROVIDERS[STATE.currentProvider];
+                const fullUrl = provider.url + encodeURIComponent(cleanQuery);
+                
+                STATE.activeQueryUrl = fullUrl;
+                saveSearchToHistory(cleanQuery, STATE.currentProvider);
+                DOM.suggestionsPanel.classList.add('hidden');
+
+                // Check Electron native navigation delegate
+                if (window.electronAPI && window.electronAPI.openExternalSearch) {
+                    window.electronAPI.openExternalSearch(fullUrl);
+                    return;
+                }
+
+                // Render in embedded frame container
+                DOM.welcomeView.classList.add('hidden');
+                DOM.iframeContainer.classList.remove('hidden');
+                DOM.frameToolbar.classList.remove('hidden');
+                DOM.frameUrlDisplay.textContent = fullUrl;
+                DOM.frameFallbackOverlay.classList.add('hidden');
+
+                DOM.contentFrame.src = fullUrl;
+
+                // Detect Potential X-Frame-Options blocking timer
+                const timer = setTimeout(() => {
+                    DOM.frameFallbackOverlay.classList.remove('hidden');
+                }, 2500);
+
+                DOM.contentFrame.onload = () => {
+                    clearTimeout(timer);
+                };
+            }
+
+            function openExternalUrl(url) {
+                if (window.electronAPI && window.electronAPI.openExternal) {
+                    window.electronAPI.openExternal(url);
+                } else {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            }
+
+            function renderSuggestions(query) {
+                if (!query) return;
+                const matches = STATE.searchHistory.filter(item => 
+                    item.query.toLowerCase().includes(query.toLowerCase())
+                ).slice(0, 5);
+
+                if (matches.length === 0) {
+                    DOM.suggestionsPanel.classList.add('hidden');
+                    return;
+                }
+
+                DOM.suggestionsPanel.innerHTML = matches.map(item => `
+                    <div class="suggestion-item px-4 py-2 hover:bg-cyan-950/40 cursor-pointer flex items-center justify-between text-xs border-b border-slate-800/50 last:border-0" data-query="${escapeHtml(item.query)}">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-clock-rotate-left text-gray-500"></i>
+                            <span class="text-gray-200">${escapeHtml(item.query)}</span>
+                        </div>
+                        <span class="text-[10px] text-cyan-400 uppercase font-mono">${item.provider}</span>
+                    </div>
+                `).join('');
+
+                DOM.suggestionsPanel.classList.remove('hidden');
+
+                DOM.suggestionsPanel.querySelectorAll('.suggestion-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const q = el.dataset.query;
+                        DOM.searchInput.value = q;
+                        executeSearch(q);
+                    });
+                });
+            }
+
+            function renderRecentHistory() {
+                if (STATE.searchHistory.length === 0) {
+                    DOM.recentTagsList.innerHTML = `<span class="text-xs text-gray-500 italic">No search history yet. Try searching for something above!</span>`;
+                    return;
+                }
+
+                DOM.recentTagsList.innerHTML = STATE.searchHistory.slice(0, 8).map(item => `
+                    <button class="history-tag px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/30 text-xs text-gray-300 transition-all flex items-center space-x-2" data-query="${escapeHtml(item.query)}">
+                        <i class="fa-solid fa-magnifying-glass text-[10px] text-cyan-400"></i>
+                        <span>${escapeHtml(item.query)}</span>
+                    </button>
+                `).join('');
+
+                DOM.recentTagsList.querySelectorAll('.history-tag').forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        const q = tag.dataset.query;
+                        DOM.searchInput.value = q;
+                        executeSearch(q);
+                    });
+                });
+            }
+
+            function clearHistory() {
+                STATE.searchHistory = [];
+                try { localStorage.removeItem('nexa_search_history'); } catch(e){}
+                renderRecentHistory();
+                showNotice('Search history cleared.');
+            }
+
+            function initVoiceRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    DOM.btnVoiceSearch.style.display = 'none';
+                    return;
+                }
+
+                STATE.recognition = new SpeechRecognition();
+                STATE.recognition.continuous = false;
+                STATE.recognition.interimResults = true;
+                STATE.recognition.lang = 'en-US';
+
+                STATE.recognition.onstart = () => {
+                    STATE.isVoiceActive = true;
+                    DOM.micIcon.classList.add('recording-active');
+                    DOM.voiceStatusBanner.classList.remove('hidden');
+                    DOM.voiceStatusText.textContent = 'Listening... Speak your query now.';
+                };
+
+                STATE.recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0].transcript)
+                        .join('');
+                    DOM.searchInput.value = transcript;
+                    DOM.btnClearInput.classList.remove('hidden');
+                };
+
+                STATE.recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    stopVoiceSearch();
+                    showNotice(`Voice search error: ${event.error}`);
+                };
+
+                STATE.recognition.onend = () => {
+                    stopVoiceSearch();
+                    if (DOM.searchInput.value.trim().length > 0) {
+                        executeSearch(DOM.searchInput.value);
+                    }
+                };
+            }
+
+            function toggleVoiceSearch() {
+                if (!STATE.recognition) return;
+                if (STATE.isVoiceActive) stopVoiceSearch();
+                else {
+                    try { STATE.recognition.start(); } catch(e) { stopVoiceSearch(); }
+                }
+            }
+
+            function stopVoiceSearch() {
+                STATE.isVoiceActive = false;
+                if (STATE.recognition) {
+                    try { STATE.recognition.stop(); } catch(e){}
+                }
+                DOM.micIcon.classList.remove('recording-active');
+                DOM.voiceStatusBanner.classList.add('hidden');
+            }
+
+            function initFirebaseFallback() {
+                // Check if external firebase-config exists
+                if (window.firebaseApp) {
+                    console.log('Firebase app instance detected.');
+                }
+            }
+
+            function handleGoogleSignIn() {
+                showAuthStatus('Initiating OAuth flow...', 'info');
+                
+                if (window.electronAPI && window.electronAPI.signInWithGoogle) {
+                    window.electronAPI.signInWithGoogle()
+                        .then(user => updateUserState(user))
+                        .catch(err => showAuthStatus(`Authentication failed: ${err.message}`, 'error'));
+                } else {
+                    // Informative status explanation regarding Electron Google OAuth restrictions
+                    showAuthStatus(
+                        'Google Sign-In in Electron requires Custom URI Scheme handling in main.js. Please complete the OAuth integration in Electron main process.', 
+                        'warning'
+                    );
+                }
+            }
+
+            function updateUserState(user) {
+                if (user) {
+                    STATE.user = user;
+                    DOM.userNameDisplay.textContent = user.displayName || 'Account';
+                    DOM.menuUserName.textContent = user.displayName || 'Google User';
+                    DOM.menuUserEmail.textContent = user.email || '';
+                    DOM.btnMenuSignin.classList.add('hidden');
+                    DOM.btnMenuSignout.classList.remove('hidden');
+                    if (user.photoURL) {
+                        DOM.userAvatarContainer.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover"/>`;
+                    }
+                    closeModal(DOM.modalAuth);
+                }
+            }
+
+            function signOutUser() {
+                STATE.user = null;
+                DOM.userNameDisplay.textContent = 'Guest';
+                DOM.menuUserName.textContent = 'Guest User';
+                DOM.menuUserEmail.textContent = 'Not signed in';
+                DOM.btnMenuSignin.classList.remove('hidden');
+                DOM.btnMenuSignout.classList.add('hidden');
+                DOM.userAvatarContainer.innerHTML = `<i class="fa-solid fa-user text-[10px]"></i>`;
+                DOM.profileMenu.classList.add('hidden');
+                showNotice('Signed out successfully.');
+            }
+
+            function showAuthStatus(msg, type) {
+                DOM.authStatusMessage.textContent = msg;
+                DOM.authStatusMessage.classList.remove('hidden', 'bg-red-950/60', 'text-red-300', 'border-red-500/30', 'bg-amber-950/60', 'text-amber-300', 'border-amber-500/30', 'bg-cyan-950/60', 'text-cyan-300', 'border-cyan-500/30');
+
+                if (type === 'error') {
+                    DOM.authStatusMessage.classList.add('bg-red-950/60', 'text-red-300', 'border-red-500/30');
+                } else if (type === 'warning') {
+                    DOM.authStatusMessage.classList.add('bg-amber-950/60', 'text-amber-300', 'border-amber-500/30');
+                } else {
+                    DOM.authStatusMessage.classList.add('bg-cyan-950/60', 'text-cyan-300', 'border-cyan-500/30');
+                }
+            }
+
+            function toggleTheme() {
+                const nextTheme = STATE.settings.theme === 'default' ? 'cyberpunk' : 'default';
+                STATE.settings.theme = nextTheme;
+                DOM.settingTheme.value = nextTheme;
+                applyTheme(nextTheme);
+                saveStorageSettings();
+            }
+
+            function applyTheme(theme) {
+                if (theme === 'cyberpunk') {
+                    document.body.classList.add('theme-cyberpunk');
+                } else {
+                    document.body.classList.remove('theme-cyberpunk');
+                }
+            }
+
+            function detectRuntimeEnvironment() {
+                const isElectron = !!(window.electronAPI || (window.process && window.process.type));
+                if (isElectron) {
+                    DOM.platformContextDisplay.textContent = 'Electron Native Desktop Client (Windows)';
+                } else {
+                    DOM.platformContextDisplay.textContent = 'Standard Web Browser Renderer (Fallback Mode)';
+                }
+            }
+
+            function openModal(modal) {
+                modal.classList.add('active');
+            }
+
+            function closeModal(modal) {
+                modal.classList.remove('active');
+            }
+
+            function showNotice(message) {
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl glass-panel border border-cyan-500/40 text-xs text-cyan-200 shadow-2xl transition-all opacity-0 transform translate-y-2';
+                toast.innerHTML = `<i class="fa-solid fa-circle-info mr-2 text-cyan-400"></i>${escapeHtml(message)}`;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.remove('opacity-0', 'translate-y-2');
+                }, 50);
+
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+        })();
+    </script>
+</body>
+</html>
