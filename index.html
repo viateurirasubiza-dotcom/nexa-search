@@ -29,13 +29,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-[#050B14] text-[#F4F8FF] font-sans antialiased selection:bg-[#28E5FF] selection:text-[#050B14] overflow-x-hidden">
 
     <header class="fixed top-0 left-0 right-0 z-50 bg-[#07111F]/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#home" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-[#28E5FF] rounded-lg p-1">
+            <a href="./index.html#home" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-[#28E5FF] rounded-lg p-1">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4385FF] to-[#28E5FF] p-[2px] shadow-lg shadow-[#28E5FF]/20">
                     <div class="w-full h-full bg-[#07111F] rounded-[10px] flex items-center justify-center">
                         <svg class="w-5 h-5 text-[#28E5FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -48,24 +48,24 @@
             </a>
 
             <nav class="hidden md:flex items-center space-x-8">
-                <a href="#home" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Home</a>
-                <a href="#features" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Features</a>
-                <a href="#preview" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Preview</a>
-                <a href="#about" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">About</a>
-                <a href="#faq" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">FAQ</a>
+                <a href="./index.html#home" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Home</a>
+                <a href="./index.html#features" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Features</a>
+                <a href="./index.html#preview" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">Preview</a>
+                <a href="./index.html#about" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">About</a>
+                <a href="./index.html#faq" class="text-sm font-medium text-[#9AABC2] hover:text-[#28E5FF] transition-colors">FAQ</a>
             </nav>
 
             <div class="hidden md:flex items-center space-x-4">
                 <button onclick="openReleaseModal()" class="text-xs font-semibold text-[#9AABC2] hover:text-white px-3 py-2 rounded-lg border border-white/10 hover:border-white/30 transition-all cursor-pointer">
                     Release Info
                 </button>
-                <button onclick="handleDownload()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-[#28E5FF] cursor-pointer">
+                <a href="https://github.com/viateurirasubiza-dotcom/nexa-search/releases/latest/download/NEXA%20Search%20Setup%201.0.0.exe" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-[#28E5FF]">
                     <span class="absolute inset-0 bg-gradient-to-r from-[#28E5FF] to-[#4385FF]"></span>
                     <span class="relative px-5 py-2.5 bg-[#07111F] rounded-[11px] flex items-center space-x-2 text-sm font-semibold text-white group-hover:bg-opacity-0 transition-all">
                         <svg class="w-4 h-4 text-[#28E5FF] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         <span>Download</span>
                     </span>
-                </button>
+                </a>
             </div>
 
             <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-[#9AABC2] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#28E5FF]" aria-label="Toggle menu">
@@ -74,17 +74,17 @@
         </div>
 
         <div id="mobile-menu" class="hidden md:hidden bg-[#07111F] border-b border-white/10 px-4 pt-2 pb-6 space-y-3">
-            <a href="#home" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Home</a>
-            <a href="#features" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Features</a>
-            <a href="#preview" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Preview</a>
-            <a href="#about" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">About</a>
-            <a href="#faq" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">FAQ</a>
+            <a href="./index.html#home" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Home</a>
+            <a href="./index.html#features" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Features</a>
+            <a href="./index.html#preview" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Preview</a>
+            <a href="./index.html#about" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">About</a>
+            <a href="./index.html#faq" class="block py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">FAQ</a>
             <button onclick="openReleaseModal()" class="w-full text-left py-2 text-base font-medium text-[#9AABC2] hover:text-[#28E5FF]">Release Info</button>
             <div class="pt-2">
-                <button onclick="handleDownload()" class="w-full py-3 bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-[#28E5FF]/20 cursor-pointer">
+                <a href="https://github.com/viateurirasubiza-dotcom/nexa-search/releases/latest/download/NEXA%20Search%20Setup%201.0.0.exe" class="w-full py-3 bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-[#28E5FF]/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Download for Windows</span>
-                </button>
+                </a>
             </div>
         </div>
     </header>
@@ -106,11 +106,11 @@
                             Discover a modern desktop browsing experience built around a clean interface, customizable appearance, and quick access to the web. Designed for Windows.
                         </p>
                         <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                            <button onclick="handleDownload()" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold shadow-lg shadow-[#28E5FF]/25 hover:scale-[1.02] transition-all flex items-center justify-center space-x-3 cursor-pointer">
+                            <a href="https://github.com/viateurirasubiza-dotcom/nexa-search/releases/latest/download/NEXA%20Search%20Setup%201.0.0.exe" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold shadow-lg shadow-[#28E5FF]/25 hover:scale-[1.02] transition-all flex items-center justify-center space-x-3 text-center">
                                 <svg class="w-5 h-5 text-[#050B14]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 <span>Download for Windows</span>
-                            </button>
-                            <a href="#features" class="w-full sm:w-auto px-6 py-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-white font-medium border border-white/10 transition-all flex items-center justify-center space-x-2">
+                            </a>
+                            <a href="./index.html#features" class="w-full sm:w-auto px-6 py-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-white font-medium border border-white/10 transition-all flex items-center justify-center space-x-2">
                                 <span>Explore Features</span>
                             </a>
                         </div>
@@ -156,15 +156,15 @@
                 <div class="bg-[#07111F] border border-white/15 rounded-3xl p-8 sm:p-14 shadow-2xl">
                     <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Get NEXA Search for Windows</h2>
                     <p class="text-[#9AABC2] mb-8">Download the verified installation package and start browsing today.</p>
-                    <button onclick="handleDownload()" class="px-10 py-4 rounded-xl bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold shadow-lg shadow-[#28E5FF]/25 hover:scale-[1.02] transition-all cursor-pointer">
+                    <a href="https://github.com/viateurirasubiza-dotcom/nexa-search/releases/latest/download/NEXA%20Search%20Setup%201.0.0.exe" class="inline-block px-10 py-4 rounded-xl bg-gradient-to-r from-[#28E5FF] to-[#4385FF] text-[#050B14] font-bold shadow-lg shadow-[#28E5FF]/25 hover:scale-[1.02] transition-all text-center">
                         Download NEXA Search Setup 1.0.0.exe
-                    </button>
+                    </a>
                     <p class="mt-4 text-xs text-[#9AABC2]">Developer: IRASUBIZA Viateur | East African University Rwanda (EAUR)</p>
                 </div>
             </div>
         </section>
 
-        <!-- FULLY FIXED FAQ SECTION -->
+        <!-- FAQ SECTION - IMISHAHIRWE Y'IBIBAZO BYOSE 8 -->
         <section id="faq" class="py-24 bg-[#07111F]/50 border-t border-b border-white/5">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center space-y-4 mb-16">
@@ -180,7 +180,7 @@
                             <span class="text-base font-semibold text-white">1. What is NEXA Search?</span>
                             <svg id="faq-icon-1" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-1" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-1" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             NEXA Search is an independent desktop browser application developed for Windows by IRASUBIZA Viateur at East African University Rwanda (EAUR).
                         </div>
                     </div>
@@ -191,7 +191,7 @@
                             <span class="text-base font-semibold text-white">2. Which operating system does it support?</span>
                             <svg id="faq-icon-2" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-2" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-2" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             NEXA Search is built specifically for Windows desktop environments (x64).
                         </div>
                     </div>
@@ -202,8 +202,8 @@
                             <span class="text-base font-semibold text-white">3. How do I install NEXA Search?</span>
                             <svg id="faq-icon-3" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-3" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
-                            Download the installer (`NEXA Search Setup 1.0.0.exe`) from the download section, run the setup file, and follow the installer instructions.
+                        <div id="faq-content-3" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                            Download the installer (NEXA Search Setup 1.0.0.exe) from the download section, run the setup file, and follow the installer instructions.
                         </div>
                     </div>
 
@@ -213,7 +213,7 @@
                             <span class="text-base font-semibold text-white">4. Is NEXA Search free?</span>
                             <svg id="faq-icon-4" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-4" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-4" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             Yes, NEXA Search is available for download as an independent desktop software project.
                         </div>
                     </div>
@@ -224,7 +224,7 @@
                             <span class="text-base font-semibold text-white">5. How do I download the installer?</span>
                             <svg id="faq-icon-5" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-5" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-5" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             Click any "Download" button on this website to instantly access the official Windows installer asset.
                         </div>
                     </div>
@@ -235,7 +235,7 @@
                             <span class="text-base font-semibold text-white">6. Who develops NEXA Search?</span>
                             <svg id="faq-icon-6" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-6" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-6" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             NEXA Search is created and maintained by IRASUBIZA Viateur at East African University Rwanda (EAUR).
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                             <span class="text-base font-semibold text-white">7. What should I do if Windows displays a security warning?</span>
                             <svg id="faq-icon-7" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-7" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-7" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             Ensure you downloaded the file directly from this official repository release page before proceeding with installation.
                         </div>
                     </div>
@@ -257,7 +257,7 @@
                             <span class="text-base font-semibold text-white">8. How can I report a problem?</span>
                             <svg id="faq-icon-8" class="w-5 h-5 text-[#9AABC2] transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div id="faq-content-8" class="hidden px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
+                        <div id="faq-content-8" class="px-6 pb-5 text-sm text-[#9AABC2] leading-relaxed border-t border-white/5 pt-4">
                             Issues and feedback can be reported through the official GitHub repository channel.
                         </div>
                     </div>
@@ -281,6 +281,6 @@
         </div>
     </div>
 
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
